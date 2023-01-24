@@ -1,110 +1,78 @@
 #include "sort.h"
-#include <stdio.h>
-/**
- *_calloc - this is a calloc function
- *@nmemb: number of elemets
- *@size: bit size of each element
- *Return: pointer to memory assignement
- */
-void *_calloc(unsigned int nmemb, unsigned int size)
-{
-	unsigned int i = 0;
-	char *p;
 
-	if (nmemb == 0 || size == 0)
-		return ('\0');
-	p = malloc(nmemb * size);
-	if (p == '\0')
-		return ('\0');
-	for (i = 0; i < (nmemb * size); i++)
-		p[i] = '\0';
-	return (p);
-}
 /**
- *merge - make a merge
- *@arr: one from start to mid
- *@tmp: temp array used in merge, was created outside to
- *optimize reducing the system calls
- *@start: first element position
- *@mid: array middle
- *@end: last element position
- **/
-void merge(int *arr, int *tmp, int start, int mid, int end)
-{
-	/*  sizes and temp arrays */
-	int size_left = mid - start + 1, size_right = end - mid;
-	int *array_left, *array_right;
-	/* counters */
-	int left, right, i = 0;
-
-	array_left = &tmp[0];
-	array_right = &tmp[size_right];
-	for (left = 0; left < size_left; left++)
-		array_left[left] = arr[start + left];
-	for (right = 0; right < size_right; right++)
-		array_right[right] = arr[mid + 1 + right];
-	left = 0, right = 0, i = start;
-	/* merging tmp arrays into main array*/
-	while (left < size_left && right < size_right)
-	{
-		if (array_left[left] <= array_right[right])
-			arr[i] = array_left[left], left++;
-		else
-			arr[i] = array_right[right], right++;
-		i++;
-	}
-	/* merging remaining left array into main array*/
-	while (left < size_left)
-		arr[i] = array_left[left], left++, i++;
-	/* merging remaining right array into main array*/
-	while (right < size_right)
-		arr[i] = array_right[right], right++, i++;
-	printf("Merging...\n");
-	printf("[left]: ");
-	print_array(array_left, left);
-	printf("[right]: ");
-	print_array(array_right, right);
-	printf("[Done]: ");
-	print_array(&arr[start], left + right);
-}
-/**
- *mergesort - function that sorts an array of integers
- *in ascending order using the Merge sort algorithm
- *@array: array of integers
- *@tmp: temp array used in merge, was created outside to
- *optimize reducing the system calls
- *@start: fisrt element position
- *@end: last element position
- *Return: void
+ * merge_sort-Write a function tha print order list
+ * @array:un order list
+ * @size:size of unorder list
  */
-void mergesort(int *array, int *tmp, int start, int end)
-{
-	int mid;
 
-	mid = (start + end) / 2;
-	if ((start + end) % 2 == 0)
-		mid--;
-	if (mid >= start)
-	{
-		mergesort(array, tmp, start, mid);
-		mergesort(array, tmp, mid + 1, end);
-		merge(array, tmp, start, mid, end);
-	}
-}
-/**
- *merge_sort - function that sorts an array of integers
- *in ascending order using the Merge sort algorithm
- *@size: size of the list
- *@array: array of integers
- *Return: void
- */
+
 void merge_sort(int *array, size_t size)
 {
-	int *tmp;
+	int *new_arr;
 
-	if (!array || size < 2)
-		return;
-	tmp = _calloc(size, sizeof(int));
-	mergesort(array, tmp, 0, size - 1);
-	free(tmp);
+	new_arr = malloc(sizeof(int) * size);
+
+	merge_recursion(array, new_arr, 0, size);
+	free(new_arr);
+}
+
+/**
+ * merge_recursion-recursion of list
+ * @array:list
+ * @new_arr:new list
+ * @start:list to start
+ * @end:end of list
+ */
+
+void merge_recursion(int *array, int *new_arr, size_t start, size_t end)
+{
+	size_t mid;
+
+	if ((end - start) > 1)
+	{
+		mid = (end - start) / 2 + start;
+		merge_recursion(array, new_arr, start, mid);
+		merge_recursion(array, new_arr, mid, end);
+		merge_re_sort(array, new_arr, start, mid, end);
+	}
+}
+
+/**
+ * merge_re_sort-sort list by using divid and qu
+ * @array:list of orginal array
+ * @new_arr:new_orderd array
+ * @start:list is start from 0
+ * @end:list end in size
+ * @mid:mid of list
+ */
+
+void merge_re_sort(int *array, int *new_arr, size_t start,
+		size_t mid, size_t end)
+{
+	size_t i, j, k = 0;
+
+	printf("Merging...\n");
+	printf("[left]: ");
+	print_array(array + start, mid - start);
+	printf("[right]: ");
+	print_array(array + mid, end - mid);
+	for (i = start, j = mid; i < mid && j < end; k++)
+	{
+		if (array[i] < array[j])
+			new_arr[k] = array[i++];
+		else
+			new_arr[k] = array[j++];
+	}
+	while (i < mid)
+		new_arr[k++] = array[i++];
+	while (j < end)
+		new_arr[k++] = array[j++];
+	for (k = start, i = 0; k < end; k++)
+	{
+		array[k] = new_arr[i++];
+	}
+
+	printf("[Done]: ");
+	print_array(array + start, end - start);
 }
