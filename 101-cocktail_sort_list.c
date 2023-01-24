@@ -1,91 +1,74 @@
 #include "sort.h"
-
 /**
- * len_size-Write a function that sorts a double linke
- * @list:list of linked list
- * Return:lenght of list
+ * swap - swaps both
+ * @p: first node to swap
+ * @c: second node to swap
+ * @list: list to set null or not
  */
-
-int len_size(listint_t *list)
+void swap(listint_t *p, listint_t *c, listint_t **list)
 {
-	int len = 0;
-
-	while (list)
+	if (!(p->prev))
 	{
-		len++;
-		list = list->next;
+		p->next = c->next;
+		if (c->next)
+			c->next->prev = p;
+		c->next = p;
+		c->prev = NULL;
+		p->prev = c;
+		*list = c;
 	}
-	return (len);
+	else
+	{
+		c->prev->next = c->next;
+		if (c->next)
+			c->next->prev = c->prev;
+		p->prev->next = c;
+		c->prev = p->prev;
+		p->prev = c;
+		c->next = p;
+	}
 }
+
 /**
- * cocktail_sort_list-Write a function that sorts a double linke
- * @list:list of linked list
+ * cocktail_sort_list - inserts right unsorted side into left sorted side
+ * @list: doubly linked list to sort
  */
 void cocktail_sort_list(listint_t **list)
 {
-	int sorted = 0;
+	listint_t *c, *nextnode;
+	int swapped;
 
-	listint_t *curr = *list;
-
-	if (!list || !*list || len_size(*list) < 2)
+	if (list == NULL || !(*list) || (*list)->next == NULL)
 		return;
 
-	while (!sorted)
-	{
-		sorted = 1;
-		while (curr->next)
+	c = (*list);
+	do {
+		swapped = 0;
+		while (c->next)
 		{
-			if (curr->n > curr->next->n)
+			nextnode = c->next;
+			if (nextnode && c->n > nextnode->n)
 			{
-				sorted = 0;
-				support_list(list, &curr);
-				print_list(*list);
+				swap(c, nextnode, list);
+				swapped = 1;
+				print_list((*list));
 			}
 			else
-				curr = curr->next;
+				c = c->next;
 		}
-		if (sorted)
-			break;
-		curr = curr->prev;
-		while (curr->prev)
+		c = c->prev;
+		while (c->prev)
 		{
-			if (curr->n < curr->prev->n)
+			nextnode = c->prev;
+			if (nextnode && c->n < nextnode->n)
 			{
-				sorted = 0;
-				curr = curr->prev;
-				support_list(list, &curr);
-				print_list(*list);
+				swap(nextnode, c, list);
+				swapped = 1;
+				print_list((*list));
 			}
 			else
-				curr = curr->prev;
+				c = c->prev;
 		}
-	}
-}
-
-/**
- * support_list-insert list in case node list
- * @list:nodelist
- * @new:application
- */
-
-void support_list(listint_t **list, listint_t **new)
-{
-	listint_t *one, *two, *three, *four;
-
-	one = (*new)->prev;
-	two = *new;
-	three = (*new)->next;
-	four = (*new)->next->next;
-
-	two->next = four;
-	if (four)
-		four->prev = two;
-	three->next = two;
-	three->prev = one;
-	if (one)
-		one->next = three;
-	else
-		*list = three;
-	two->prev = three;
-	*new = three;
+		c = c->next;
+	} while (swapped);
 }
