@@ -1,78 +1,79 @@
 #include "sort.h"
-
 /**
- * merge_sort-Write a function tha print order list
- * @array:un order list
- * @size:size of unorder list
+ * prints - prints left, right, and merged halves
+ * @arr: original or tmp array
+ * @side: left, right, or merged half
+ * @start: starting index
+ * @end: ending index
  */
+void prints(int *arr, char *side, size_t start, size_t end)
+{
+	size_t i;
 
+	printf("[%s]: ", side);
+	for (i = start; i < end; i++)
+	{
+		if (i != (end - 1))
+			printf("%d, ", arr[i]);
+		else
+			printf("%d\n", arr[i]);
+	}
 
+}
+/**
+ * rec_merge - recursively splits and merges halves
+ * @array: original array
+ * @sortArr: tmp array to hold sorted elements
+ * @l: starting index
+ * @r: ending index
+ */
+void rec_merge(int *array, int *sortArr, size_t l, size_t r)
+{
+	size_t i, l_half, r_half;
+	size_t mid = (l + r) / 2;
+
+	if (r - l <= 1)
+		return;
+
+	rec_merge(array, sortArr, l, mid);
+	rec_merge(array, sortArr, mid, r);
+	printf("Merging...\n");
+	prints(array, "left", l, mid);
+	prints(array, "right", mid, r);
+	l_half = l;
+	r_half = mid;
+	for (i = l; i < r; i++)
+	{
+		if ((l_half < mid) &&
+		    ((r_half == r) || (array[l_half] < array[r_half])))
+		{
+			sortArr[i] = array[l_half];
+			l_half++;
+		}
+		else
+		{
+			sortArr[i] = array[r_half];
+			r_half++;
+		}
+	}
+	prints(sortArr, "Done", l, r);
+	for (i = l; i < r; i++)
+		array[i] = sortArr[i];
+}
+/**
+ * merge_sort - sorts mergly
+ * @array: array sort
+ * @size: size of array
+ */
 void merge_sort(int *array, size_t size)
 {
-	int *new_arr;
+	int *sortArr;
 
-	new_arr = malloc(sizeof(int) * size);
-
-	merge_recursion(array, new_arr, 0, size);
-	free(new_arr);
-}
-
-/**
- * merge_recursion-recursion of list
- * @array:list
- * @new_arr:new list
- * @start:list to start
- * @end:end of list
- */
-
-void merge_recursion(int *array, int *new_arr, size_t start, size_t end)
-{
-	size_t mid;
-
-	if ((end - start) > 1)
-	{
-		mid = (end - start) / 2 + start;
-		merge_recursion(array, new_arr, start, mid);
-		merge_recursion(array, new_arr, mid, end);
-		merge_re_sort(array, new_arr, start, mid, end);
-	}
-}
-
-/**
- * merge_re_sort-sort list by using divid and qu
- * @array:list of orginal array
- * @new_arr:new_orderd array
- * @start:list is start from 0
- * @end:list end in size
- * @mid:mid of list
- */
-
-void merge_re_sort(int *array, int *new_arr, size_t start,
-		size_t mid, size_t end)
-{
-	size_t i, j, k = 0;
-
-	printf("Merging...\n");
-	printf("[left]: ");
-	print_array(array + start, mid - start);
-	printf("[right]: ");
-	print_array(array + mid, end - mid);
-	for (i = start, j = mid; i < mid && j < end; k++)
-	{
-		if (array[i] < array[j])
-			new_arr[k] = array[i++];
-		else
-			new_arr[k] = array[j++];
-	}
-	while (i < mid)
-		new_arr[k++] = array[i++];
-	while (j < end)
-		new_arr[k++] = array[j++];
-	for (k = start, i = 0; k < end; k++)
-	{
-		array[k] = new_arr[i++];
-	}
-
-	printf("[Done]: ");
-	print_array(array + start, end - start);
+	if (!(array) || size < 2)
+		return;
+	sortArr = malloc(sizeof(int) * size);
+	if (!(sortArr))
+		return;
+	rec_merge(array, sortArr, 0, size);
+	free(sortArr);
 }
