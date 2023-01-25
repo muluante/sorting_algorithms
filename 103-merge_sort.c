@@ -1,5 +1,5 @@
 #include "sort.h"
-
+#include<stdio.h>
 /**
 * merge - Merges the splits from merge_sorty
 * @array: Array split to merge
